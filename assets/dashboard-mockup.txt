@@ -1,0 +1,12 @@
+# Dashboard Mockup
+
+Este archivo es un placeholder para la imagen del dashboard que se menciona en la documentación.
+
+En una implementación real, aquí habría una imagen PNG o SVG que muestra el diseño del dashboard principal con:
+
+1. Rueda de Estadísticas (gráfico radar)
+2. Visualización del Fit Score
+3. Visualización del DNA Grade
+4. Gráficos de progreso
+5. Panel de recomendaciones
+6. Métricas destacadas 
