@@ -193,13 +193,34 @@ export const saveOnboardingData = async (formData: FormData) => {
     somatotype: formData.getAll("somatotype"),
     training_frequency: formData.get("trainingFrequency")?.toString(),
     training_intensity: formData.get("trainingIntensity")?.toString(),
+    training_duration: formData.get("trainingDuration")?.toString(),
     training_years: formData.get("trainingYears")?.toString(),
+    // Strength metrics
+    bench_press: formData.get("benchPress")?.toString(),
+    squat: formData.get("squat")?.toString(),
+    deadlift: formData.get("deadlift")?.toString(),
+    pullups: formData.get("pullups")?.toString(),
+    // Endurance metrics
+    resting_heart_rate: formData.get("restingHeartRate")?.toString(),
+    max_heart_rate: formData.get("maxHeartRate")?.toString(),
+    running_distance: formData.get("runningDistance")?.toString(),
+    recovery_time: formData.get("recoveryTime")?.toString(),
+    // Coordination & Agility
+    coordination_level: formData.get("coordinationLevel")?.toString(),
+    sport_specific: formData.get("sportSpecific")?.toString(),
+    reaction_time: formData.get("reactionTime")?.toString(),
+    balance_level: formData.get("balanceLevel")?.toString(),
   };
 
   const healthData = {
     sleep_quality: formData.get("sleepQuality")?.toString(),
     sleep_hours: formData.get("sleepHours")?.toString(),
     stress_level: formData.get("stressLevel")?.toString(),
+    adaptability_to_change: formData.get("adaptabilityToChange")?.toString(),
+    recovery_ability: formData.get("recoveryAbility")?.toString(),
+    training_consistency: formData.get("trainingConsistency")?.toString(),
+    progress_rate: formData.get("progressRate")?.toString(),
+    tracking_method: formData.get("trackingMethod")?.toString(),
     medical_conditions: formData.getAll("medicalConditions"),
   };
 
@@ -222,10 +243,28 @@ export const saveOnboardingData = async (formData: FormData) => {
     somatotype: physicalData.somatotype.join(","),
     training_frequency: parseInt(physicalData.training_frequency || "0"),
     training_intensity: parseInt(physicalData.training_intensity || "0"),
+    training_duration: parseInt(physicalData.training_duration || "0"),
     training_years: parseInt(physicalData.training_years || "0"),
+    bench_press: parseFloat(physicalData.bench_press || "0"),
+    squat: parseFloat(physicalData.squat || "0"),
+    deadlift: parseFloat(physicalData.deadlift || "0"),
+    pullups: parseInt(physicalData.pullups || "0"),
+    resting_heart_rate: parseInt(physicalData.resting_heart_rate || "0"),
+    max_heart_rate: parseInt(physicalData.max_heart_rate || "0"),
+    running_distance: parseFloat(physicalData.running_distance || "0"),
+    recovery_time: parseInt(physicalData.recovery_time || "0"),
+    coordination_level: physicalData.coordination_level,
+    sport_specific: physicalData.sport_specific,
+    reaction_time: physicalData.reaction_time,
+    balance_level: physicalData.balance_level,
     sleep_quality: parseInt(healthData.sleep_quality || "0"),
     sleep_hours: parseFloat(healthData.sleep_hours || "0"),
     stress_level: parseInt(healthData.stress_level || "0"),
+    adaptability_to_change: parseInt(healthData.adaptability_to_change || "0"),
+    recovery_ability: healthData.recovery_ability,
+    training_consistency: healthData.training_consistency,
+    progress_rate: healthData.progress_rate,
+    tracking_method: healthData.tracking_method,
     medical_conditions: healthData.medical_conditions.join(","),
     family_athletic_level: familyData.family_athletic_level,
     family_sports: familyData.family_sports,
@@ -285,13 +324,15 @@ function calculateInitialMetrics(
   healthData: any,
   familyData: any,
 ) {
-  // Volume calculation based on training frequency, intensity, and years
+  // Volume calculation based on training frequency, intensity, duration, and years
   const trainingFrequency = parseInt(physicalData.training_frequency || "0");
   const trainingIntensity = parseInt(physicalData.training_intensity || "0");
+  const trainingDuration = parseInt(physicalData.training_duration || "0");
   const trainingYears = parseInt(physicalData.training_years || "0");
 
+  // More comprehensive volume calculation including duration
   const volume = Math.min(
-    (trainingFrequency * trainingIntensity) / 7 +
+    (trainingFrequency * trainingIntensity * (trainingDuration / 60)) / 10 +
       Math.min(trainingYears * 2, 20),
     100,
   );
@@ -320,115 +361,396 @@ function calculateInitialMetrics(
 
   potential = Math.min(potential, 100);
 
-  // Endurance calculation
+  // Endurance calculation with heart rate data and running distance
   let endurance = 0;
   // Base from training frequency and years
-  endurance += trainingFrequency * 5;
-  endurance += Math.min(trainingYears * 3, 30);
+  endurance += trainingFrequency * 3;
+  endurance += Math.min(trainingYears * 2, 20);
+
+  // Heart rate data - lower resting heart rate indicates better cardiovascular fitness
+  const restingHeartRate = parseInt(physicalData.resting_heart_rate || "60");
+  const maxHeartRate = parseInt(physicalData.max_heart_rate || "180");
+  const heartRateReserve = maxHeartRate - restingHeartRate;
+
+  // Heart rate contribution - lower resting heart rate is better
+  if (restingHeartRate < 50) endurance += 20;
+  else if (restingHeartRate < 60) endurance += 15;
+  else if (restingHeartRate < 70) endurance += 10;
+  else if (restingHeartRate < 80) endurance += 5;
+
+  // Heart rate reserve contribution - higher reserve is better
+  endurance += Math.min(heartRateReserve / 5, 15);
+
+  // Running distance contribution
+  const runningDistance = parseFloat(physicalData.running_distance || "0");
+  endurance += Math.min(runningDistance * 3, 20);
+
+  // Recovery time - faster recovery indicates better endurance
+  const recoveryTime = parseInt(physicalData.recovery_time || "10");
+  if (recoveryTime < 5) endurance += 10;
+  else if (recoveryTime < 10) endurance += 5;
+  else if (recoveryTime > 20) endurance -= 5;
 
   // Adjust for somatotype
-  if (physicalData.somatotype.includes("ectomorph")) endurance += 15;
-  if (physicalData.somatotype.includes("mesomorph")) endurance += 10;
+  if (physicalData.somatotype.includes("ectomorph")) endurance += 10;
+  if (physicalData.somatotype.includes("mesomorph")) endurance += 5;
 
   // Adjust for sleep and stress
   const sleepQuality = parseInt(healthData.sleep_quality || "0");
   const stressLevel = parseInt(healthData.stress_level || "0");
-  endurance += sleepQuality / 5;
+  endurance += sleepQuality / 10;
   endurance -= stressLevel / 10;
 
   endurance = Math.max(0, Math.min(endurance, 100));
 
-  // Strength calculation
+  // Strength calculation with max lifts data
   let strength = 0;
-  // Base from training intensity
-  strength += trainingIntensity / 2;
 
-  // Adjust for somatotype
-  if (physicalData.somatotype.includes("mesomorph")) strength += 25;
-  if (physicalData.somatotype.includes("endomorph")) strength += 15;
+  // Get max lift values
+  const benchPress = parseFloat(physicalData.bench_press || "0");
+  const squat = parseFloat(physicalData.squat || "0");
+  const deadlift = parseFloat(physicalData.deadlift || "0");
+  const pullups = parseInt(physicalData.pullups || "0");
 
-  // Adjust for gender (simplified approach)
-  if (personalData.gender === "male") strength += 10;
+  // Calculate strength based on weight and gender-specific standards
+  const weight = parseFloat(personalData.weight || "70");
+  const isMale = personalData.gender === "male";
+
+  // Strength-to-weight ratios (simplified)
+  const benchRatio = benchPress / weight;
+  const squatRatio = squat / weight;
+  const deadliftRatio = deadlift / weight;
+
+  // Assign points based on strength-to-weight ratios
+  // Bench press contribution
+  if (isMale) {
+    if (benchRatio > 1.5) strength += 20;
+    else if (benchRatio > 1.2) strength += 15;
+    else if (benchRatio > 1.0) strength += 10;
+    else if (benchRatio > 0.8) strength += 5;
+    else strength += benchRatio * 5;
+  } else {
+    if (benchRatio > 1.1) strength += 20;
+    else if (benchRatio > 0.9) strength += 15;
+    else if (benchRatio > 0.7) strength += 10;
+    else if (benchRatio > 0.5) strength += 5;
+    else strength += benchRatio * 8;
+  }
+
+  // Squat contribution
+  if (isMale) {
+    if (squatRatio > 2.0) strength += 20;
+    else if (squatRatio > 1.5) strength += 15;
+    else if (squatRatio > 1.2) strength += 10;
+    else if (squatRatio > 1.0) strength += 5;
+    else strength += squatRatio * 5;
+  } else {
+    if (squatRatio > 1.5) strength += 20;
+    else if (squatRatio > 1.2) strength += 15;
+    else if (squatRatio > 1.0) strength += 10;
+    else if (squatRatio > 0.8) strength += 5;
+    else strength += squatRatio * 6;
+  }
+
+  // Deadlift contribution
+  if (isMale) {
+    if (deadliftRatio > 2.5) strength += 20;
+    else if (deadliftRatio > 2.0) strength += 15;
+    else if (deadliftRatio > 1.5) strength += 10;
+    else if (deadliftRatio > 1.2) strength += 5;
+    else strength += deadliftRatio * 4;
+  } else {
+    if (deadliftRatio > 2.0) strength += 20;
+    else if (deadliftRatio > 1.5) strength += 15;
+    else if (deadliftRatio > 1.2) strength += 10;
+    else if (deadliftRatio > 1.0) strength += 5;
+    else strength += deadliftRatio * 5;
+  }
+
+  // Pull-ups contribution
+  if (isMale) {
+    if (pullups > 20) strength += 15;
+    else if (pullups > 15) strength += 12;
+    else if (pullups > 10) strength += 8;
+    else if (pullups > 5) strength += 4;
+    else strength += pullups * 0.5;
+  } else {
+    if (pullups > 15) strength += 15;
+    else if (pullups > 10) strength += 12;
+    else if (pullups > 5) strength += 8;
+    else if (pullups > 2) strength += 4;
+    else strength += pullups * 1;
+  }
+
+  // Base from training intensity if no lift data provided
+  if (benchPress === 0 && squat === 0 && deadlift === 0 && pullups === 0) {
+    strength += trainingIntensity / 2;
+
+    // Adjust for somatotype
+    if (physicalData.somatotype.includes("mesomorph")) strength += 25;
+    if (physicalData.somatotype.includes("endomorph")) strength += 15;
+
+    // Adjust for gender (simplified approach)
+    if (isMale) strength += 10;
+  } else {
+    // Minor adjustments for somatotype
+    if (physicalData.somatotype.includes("mesomorph")) strength += 10;
+    if (physicalData.somatotype.includes("endomorph")) strength += 5;
+  }
 
   // Adjust for age
-  if (age < 30) strength += 15;
-  else if (age < 40) strength += 10;
-  else if (age < 50) strength += 5;
+  if (age < 30) strength += 10;
+  else if (age < 40) strength += 5;
+  else if (age < 50) strength += 2;
+  else if (age >= 60) strength -= 5;
 
   strength = Math.max(0, Math.min(strength, 100));
 
-  // Adaptability calculation
-  let adaptability = 50; // Start at middle
+  // Adaptability calculation with more comprehensive factors
+  let adaptability = 40; // Base value
+
+  // Direct adaptability assessment from user input
+  const adaptabilityToChange = parseInt(
+    healthData.adaptability_to_change || "50",
+  );
+  adaptability += adaptabilityToChange * 0.3; // 30% weight to self-assessment
+
+  // Recovery ability significantly affects adaptability
+  const recoveryAbility = healthData.recovery_ability || "average";
+  if (recoveryAbility === "excellent") adaptability += 20;
+  else if (recoveryAbility === "good") adaptability += 15;
+  else if (recoveryAbility === "average") adaptability += 10;
+  else if (recoveryAbility === "poor") adaptability += 5;
 
   // Sleep quality improves adaptability
-  adaptability += sleepQuality / 5;
+  adaptability += sleepQuality / 10;
 
   // Stress reduces adaptability
-  adaptability -= stressLevel / 5;
+  adaptability -= stressLevel / 8;
+
+  // Training variety (based on sport-specific skills)
+  const sportSpecific = physicalData.sport_specific || "";
+  const sportVariety = sportSpecific.split(",").length;
+  adaptability += Math.min(sportVariety * 3, 15);
 
   // Medical conditions reduce adaptability
   const medicalConditionsCount = healthData.medical_conditions.filter(
     (c: string) => c !== "none",
   ).length;
-  adaptability -= medicalConditionsCount * 5;
+  adaptability -= medicalConditionsCount * 3;
 
   // Age affects adaptability
-  if (age > 50) adaptability -= 15;
-  else if (age > 40) adaptability -= 10;
-  else if (age > 30) adaptability -= 5;
+  if (age > 60) adaptability -= 15;
+  else if (age > 50) adaptability -= 12;
+  else if (age > 40) adaptability -= 8;
+  else if (age > 30) adaptability -= 4;
+
+  // Training experience can improve adaptability (up to a point)
+  if (trainingYears > 0 && trainingYears <= 5) {
+    adaptability += trainingYears * 2; // More adaptable as you gain experience
+  } else if (trainingYears > 5) {
+    adaptability += 10; // Experienced athletes have good adaptability
+  }
 
   adaptability = Math.max(0, Math.min(adaptability, 100));
 
-  // Progress - calculated based on training consistency and intensity
-  let progress = 40; // Base value
-  progress += trainingFrequency * 3; // Frequency contributes to progress
-  progress += trainingIntensity / 5; // Intensity contributes to progress
-  progress = Math.min(progress, 100);
+  // Progress - calculated based on user-reported progress rate and tracking methods
+  let progress = 30; // Base value
 
-  // Coordination - more sophisticated calculation
-  let coordination = 50; // Base value
+  // User-reported progress rate
+  const progressRate = healthData.progress_rate || "steady";
+  if (progressRate === "veryfast") progress += 40;
+  else if (progressRate === "fast") progress += 30;
+  else if (progressRate === "steady") progress += 20;
+  else if (progressRate === "slow") progress += 10;
+  else if (progressRate === "none") progress += 0;
 
-  // Family sports background affects coordination
+  // Tracking method affects progress measurement accuracy
+  const trackingMethodProgress = healthData.tracking_method || "mental";
+  if (trackingMethodProgress === "coach") progress += 15;
+  else if (trackingMethodProgress === "app") progress += 12;
+  else if (trackingMethodProgress === "journal") progress += 10;
+  else if (trackingMethodProgress === "mental") progress += 5;
+  else if (trackingMethodProgress === "none") progress -= 5;
+
+  // Training factors still contribute
+  progress += trainingFrequency * 1; // Frequency contributes to progress
+  progress += trainingIntensity / 10; // Intensity contributes to progress
+
+  // Training years indicate historical progress
+  if (trainingYears > 0) {
+    // Diminishing returns for very experienced athletes
+    if (trainingYears <= 3) progress += trainingYears * 2;
+    else if (trainingYears <= 10) progress += 6 + (trainingYears - 3);
+    else progress += 13; // Maximum bonus for experience
+  }
+
+  progress = Math.max(0, Math.min(progress, 100));
+
+  // Coordination - more comprehensive calculation with direct assessment
+  let coordination = 30; // Base value
+
+  // Direct coordination level assessment
+  const coordinationLevel = physicalData.coordination_level || "medium";
+  if (coordinationLevel === "expert") coordination += 40;
+  else if (coordinationLevel === "advanced") coordination += 30;
+  else if (coordinationLevel === "medium") coordination += 20;
+  else if (coordinationLevel === "beginner") coordination += 10;
+
+  // Sport-specific skills that require coordination
+  const sportSpecificForCoord =
+    physicalData.sport_specific?.toString().toLowerCase() || "";
+  if (
+    sportSpecificForCoord.includes("tennis") ||
+    sportSpecificForCoord.includes("badminton")
+  )
+    coordination += 8;
+  if (
+    sportSpecificForCoord.includes("gymnastics") ||
+    sportSpecificForCoord.includes("dance")
+  )
+    coordination += 10;
+  if (
+    sportSpecificForCoord.includes("martial") ||
+    sportSpecificForCoord.includes("boxing")
+  )
+    coordination += 7;
+  if (
+    sportSpecificForCoord.includes("soccer") ||
+    sportSpecificForCoord.includes("football")
+  )
+    coordination += 6;
+  if (
+    sportSpecificForCoord.includes("basketball") ||
+    sportSpecificForCoord.includes("volleyball")
+  )
+    coordination += 8;
+  if (
+    sportSpecificForCoord.includes("climbing") ||
+    sportSpecificForCoord.includes("parkour")
+  )
+    coordination += 9;
+
+  // Balance level affects coordination
+  const balanceLevel = physicalData.balance_level || "medium";
+  if (balanceLevel === "excellent") coordination += 10;
+  else if (balanceLevel === "good") coordination += 7;
+  else if (balanceLevel === "medium") coordination += 4;
+  else if (balanceLevel === "poor") coordination += 0;
+
+  // Family sports background affects coordination (genetic component)
   const familySports = familyData.family_sports?.toString().toLowerCase() || "";
   if (familySports.includes("tennis") || familySports.includes("badminton"))
-    coordination += 10;
+    coordination += 3;
   if (familySports.includes("gymnastics") || familySports.includes("dance"))
-    coordination += 15;
+    coordination += 4;
   if (familySports.includes("martial") || familySports.includes("boxing"))
-    coordination += 8;
+    coordination += 2;
   if (familySports.includes("soccer") || familySports.includes("football"))
-    coordination += 7;
+    coordination += 2;
 
   // Age affects coordination
-  if (age < 20) coordination += 10;
-  else if (age > 60) coordination -= 15;
-  else if (age > 50) coordination -= 10;
-  else if (age > 40) coordination -= 5;
+  if (age < 20) coordination += 5;
+  else if (age > 60) coordination -= 10;
+  else if (age > 50) coordination -= 7;
+  else if (age > 40) coordination -= 3;
 
   coordination = Math.max(0, Math.min(coordination, 100));
 
-  // Agility - more detailed calculation
-  let agility = 40; // Base value
+  // Agility - comprehensive calculation including reaction time
+  let agility = 30; // Base value
+
+  // Reaction time is a key component of agility
+  const reactionTime = physicalData.reaction_time || "average";
+  if (reactionTime === "veryfast") agility += 25;
+  else if (reactionTime === "fast") agility += 20;
+  else if (reactionTime === "average") agility += 10;
+  else if (reactionTime === "slow") agility += 5;
+
+  // Sport-specific skills that require agility
+  const sportSpecificForAgility =
+    physicalData.sport_specific?.toString().toLowerCase() || "";
+  if (
+    sportSpecificForAgility.includes("tennis") ||
+    sportSpecificForAgility.includes("badminton")
+  )
+    agility += 7;
+  if (
+    sportSpecificForAgility.includes("martial") ||
+    sportSpecificForAgility.includes("boxing")
+  )
+    agility += 8;
+  if (
+    sportSpecificForAgility.includes("soccer") ||
+    sportSpecificForAgility.includes("football")
+  )
+    agility += 8;
+  if (
+    sportSpecificForAgility.includes("basketball") ||
+    sportSpecificForAgility.includes("hockey")
+  )
+    agility += 9;
+  if (
+    sportSpecificForAgility.includes("sprinting") ||
+    sportSpecificForAgility.includes("track")
+  )
+    agility += 7;
 
   // Age significantly affects agility
-  if (age < 20) agility += 25;
-  else if (age < 30) agility += 20;
-  else if (age < 40) agility += 15;
-  else if (age < 50) agility += 10;
-  else if (age < 60) agility += 5;
+  if (age < 20) agility += 15;
+  else if (age < 30) agility += 12;
+  else if (age < 40) agility += 8;
+  else if (age < 50) agility += 5;
+  else if (age < 60) agility += 2;
+  else agility -= 5;
 
   // Somatotype affects agility
-  if (physicalData.somatotype.includes("ectomorph")) agility += 15;
-  if (physicalData.somatotype.includes("mesomorph")) agility += 10;
-  if (physicalData.somatotype.includes("endomorph")) agility -= 5;
+  if (physicalData.somatotype.includes("ectomorph")) agility += 8;
+  if (physicalData.somatotype.includes("mesomorph")) agility += 5;
+  if (physicalData.somatotype.includes("endomorph")) agility -= 3;
 
   // Training intensity affects agility
-  agility += trainingIntensity / 10;
+  agility += trainingIntensity / 15;
+
+  // Balance affects agility
+  const balanceLevelForAgility = physicalData.balance_level || "medium";
+  if (balanceLevelForAgility === "excellent") agility += 8;
+  else if (balanceLevelForAgility === "good") agility += 5;
+  else if (balanceLevelForAgility === "medium") agility += 3;
+
+  // Recovery ability affects agility performance
+  const recoveryAbilityAgility = healthData.recovery_ability || "average";
+  if (recoveryAbilityAgility === "excellent") agility += 4;
+  else if (recoveryAbilityAgility === "good") agility += 2;
 
   agility = Math.max(0, Math.min(agility, 100));
 
-  // Consistency based on training frequency and routine
-  const consistency = Math.min(trainingFrequency * 14, 100);
+  // Consistency based on self-reported consistency and tracking methods
+  let consistency = 0;
+
+  // Self-reported training consistency is the primary factor
+  const trainingConsistency = healthData.training_consistency || "moderate";
+  if (trainingConsistency === "veryhigh") consistency += 70;
+  else if (trainingConsistency === "high") consistency += 55;
+  else if (trainingConsistency === "moderate") consistency += 40;
+  else if (trainingConsistency === "low") consistency += 25;
+  else if (trainingConsistency === "verylow") consistency += 10;
+
+  // Tracking method affects consistency
+  const trackingMethodConsistency = healthData.tracking_method || "mental";
+  if (trackingMethodConsistency === "coach") consistency += 15;
+  else if (trackingMethodConsistency === "app") consistency += 12;
+  else if (trackingMethodConsistency === "journal") consistency += 10;
+  else if (trackingMethodConsistency === "mental") consistency += 5;
+
+  // Training frequency still contributes to consistency
+  consistency += Math.min(trainingFrequency * 3, 15);
+
+  // Training years indicate long-term consistency
+  if (trainingYears >= 5) consistency += 10;
+  else if (trainingYears >= 2) consistency += 5;
+
+  consistency = Math.max(0, Math.min(consistency, 100));
 
   // Calculate fit score (0-1000)
   const fitScore = Math.round(
@@ -467,6 +789,17 @@ function calculateInitialMetrics(
   const muscleStructure = determineMuscleStructure(physicalData.somatotype);
   const geneticOrigins = determineGeneticOrigins(familyData);
   const geneticMutations = determineGeneticMutations(familyData);
+  const metabolicEfficiency = calculateMetabolicEfficiency(
+    personalData,
+    physicalData,
+    healthData,
+  );
+  const injuryRisk = calculateInjuryRisk(
+    personalData,
+    physicalData,
+    healthData,
+  );
+  const mentalToughness = calculateMentalToughness(healthData, physicalData);
 
   return {
     volume,
@@ -486,6 +819,9 @@ function calculateInitialMetrics(
     muscleStructure,
     geneticOrigins,
     geneticMutations,
+    metabolicEfficiency,
+    injuryRisk,
+    mentalToughness,
   };
 }
 
@@ -607,6 +943,121 @@ function determineGeneticMutations(familyData: any): string[] {
   }
 
   return mutations;
+}
+
+// Helper function to calculate metabolic efficiency
+function calculateMetabolicEfficiency(
+  personalData: any,
+  physicalData: any,
+  healthData: any,
+): number {
+  let efficiency = 50; // Base value
+
+  // Age factor - metabolism slows with age
+  const age = parseInt(personalData.age || "0");
+  if (age < 25) efficiency += 15;
+  else if (age < 35) efficiency += 10;
+  else if (age < 45) efficiency += 5;
+  else if (age > 55) efficiency -= 10;
+  else if (age > 65) efficiency -= 15;
+
+  // Body composition factor
+  if (physicalData.somatotype.includes("ectomorph")) efficiency += 15;
+  if (physicalData.somatotype.includes("mesomorph")) efficiency += 10;
+  if (physicalData.somatotype.includes("endomorph")) efficiency -= 5;
+
+  // Training intensity and frequency
+  const trainingIntensity = parseInt(physicalData.training_intensity || "0");
+  const trainingFrequency = parseInt(physicalData.training_frequency || "0");
+  efficiency += trainingIntensity / 10 + trainingFrequency * 2;
+
+  // Sleep quality affects metabolism
+  const sleepQuality = parseInt(healthData.sleep_quality || "0");
+  efficiency += sleepQuality / 5;
+
+  // Stress level affects metabolism negatively
+  const stressLevel = parseInt(healthData.stress_level || "0");
+  efficiency -= stressLevel / 5;
+
+  return Math.max(0, Math.min(100, efficiency));
+}
+
+// Helper function to calculate injury risk
+function calculateInjuryRisk(
+  personalData: any,
+  physicalData: any,
+  healthData: any,
+): number {
+  let risk = 50; // Base value (higher is worse)
+
+  // Age factor - injury risk increases with age
+  const age = parseInt(personalData.age || "0");
+  if (age > 50) risk += 20;
+  else if (age > 40) risk += 15;
+  else if (age > 30) risk += 10;
+  else if (age < 20) risk += 5; // Young athletes also have some risk due to growth
+
+  // Training intensity vs recovery balance
+  const trainingIntensity = parseInt(physicalData.training_intensity || "0");
+  const recoveryAbility = healthData.recovery_ability || "average";
+
+  // High intensity with poor recovery is risky
+  if (trainingIntensity > 80) {
+    if (recoveryAbility === "poor") risk += 25;
+    else if (recoveryAbility === "average") risk += 15;
+    else if (recoveryAbility === "good") risk += 5;
+  }
+
+  // Medical conditions increase risk
+  const medicalConditions = healthData.medical_conditions || [];
+  risk += medicalConditions.filter((c: string) => c !== "none").length * 5;
+
+  // Sleep quality affects recovery and injury risk
+  const sleepQuality = parseInt(healthData.sleep_quality || "0");
+  risk -= sleepQuality / 5;
+
+  // Stress increases injury risk
+  const stressLevel = parseInt(healthData.stress_level || "0");
+  risk += stressLevel / 5;
+
+  // Training experience reduces risk
+  const trainingYears = parseInt(physicalData.training_years || "0");
+  risk -= Math.min(trainingYears * 2, 20);
+
+  return Math.max(0, Math.min(100, risk));
+}
+
+// Helper function to calculate mental toughness
+function calculateMentalToughness(healthData: any, physicalData: any): number {
+  let toughness = 40; // Base value
+
+  // Adaptability to change is a key component of mental toughness
+  const adaptabilityToChange = parseInt(
+    healthData.adaptability_to_change || "50",
+  );
+  toughness += adaptabilityToChange * 0.3;
+
+  // Stress management is crucial for mental toughness
+  const stressLevel = parseInt(healthData.stress_level || "50");
+  toughness -= stressLevel * 0.2;
+  toughness += (100 - stressLevel) * 0.1; // Ability to handle stress
+
+  // Training consistency shows discipline
+  const trainingConsistency = healthData.training_consistency || "moderate";
+  if (trainingConsistency === "veryhigh") toughness += 20;
+  else if (trainingConsistency === "high") toughness += 15;
+  else if (trainingConsistency === "moderate") toughness += 10;
+  else if (trainingConsistency === "low") toughness += 5;
+
+  // Training intensity shows willingness to push limits
+  const trainingIntensity = parseInt(physicalData.training_intensity || "0");
+  toughness += trainingIntensity / 10;
+
+  // Training years indicate perseverance
+  const trainingYears = parseInt(physicalData.training_years || "0");
+  toughness += Math.min(trainingYears, 10);
+
+  return Math.max(0, Math.min(100, toughness));
 }
 
 export const signOutAction = async () => {

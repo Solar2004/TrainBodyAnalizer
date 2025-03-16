@@ -348,6 +348,29 @@ export default function Onboarding() {
                         </div>
 
                         <div className="space-y-2">
+                          <Label
+                            htmlFor="trainingDuration"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Average Training Duration (minutes per session)
+                          </Label>
+                          <Slider
+                            id="trainingDuration"
+                            name="trainingDuration"
+                            defaultValue={[60]}
+                            max={180}
+                            step={15}
+                            className="py-4"
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>15</span>
+                            <span>60</span>
+                            <span>120</span>
+                            <span>180</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
                           <Label htmlFor="trainingYears" className="text-sm">
                             Years of Consistent Training
                           </Label>
@@ -358,6 +381,210 @@ export default function Onboarding() {
                             min="0"
                             max="50"
                           />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Strength Metrics</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="benchPress" className="text-sm">
+                              Bench Press Max (kg)
+                            </Label>
+                            <Input
+                              id="benchPress"
+                              name="benchPress"
+                              type="number"
+                              min="0"
+                              max="300"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="squat" className="text-sm">
+                              Squat Max (kg)
+                            </Label>
+                            <Input
+                              id="squat"
+                              name="squat"
+                              type="number"
+                              min="0"
+                              max="400"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="deadlift" className="text-sm">
+                              Deadlift Max (kg)
+                            </Label>
+                            <Input
+                              id="deadlift"
+                              name="deadlift"
+                              type="number"
+                              min="0"
+                              max="400"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="pullups" className="text-sm">
+                              Max Pull-ups (reps)
+                            </Label>
+                            <Input
+                              id="pullups"
+                              name="pullups"
+                              type="number"
+                              min="0"
+                              max="100"
+                              placeholder="0"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Endurance Metrics</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label
+                              htmlFor="restingHeartRate"
+                              className="text-sm"
+                            >
+                              Resting Heart Rate (bpm)
+                            </Label>
+                            <Input
+                              id="restingHeartRate"
+                              name="restingHeartRate"
+                              type="number"
+                              min="40"
+                              max="120"
+                              placeholder="60"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="maxHeartRate" className="text-sm">
+                              Max Heart Rate (bpm)
+                            </Label>
+                            <Input
+                              id="maxHeartRate"
+                              name="maxHeartRate"
+                              type="number"
+                              min="120"
+                              max="220"
+                              placeholder="180"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label
+                              htmlFor="runningDistance"
+                              className="text-sm"
+                            >
+                              Max Running Distance (km)
+                            </Label>
+                            <Input
+                              id="runningDistance"
+                              name="runningDistance"
+                              type="number"
+                              min="0"
+                              max="100"
+                              step="0.5"
+                              placeholder="5"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="recoveryTime" className="text-sm">
+                              Recovery Time (minutes)
+                            </Label>
+                            <Input
+                              id="recoveryTime"
+                              name="recoveryTime"
+                              type="number"
+                              min="1"
+                              max="60"
+                              placeholder="10"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Coordination & Agility</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label
+                              htmlFor="coordinationLevel"
+                              className="text-sm"
+                            >
+                              Coordination Level
+                            </Label>
+                            <Select
+                              name="coordinationLevel"
+                              defaultValue="medium"
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select level" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="beginner">
+                                  Beginner
+                                </SelectItem>
+                                <SelectItem value="medium">
+                                  Intermediate
+                                </SelectItem>
+                                <SelectItem value="advanced">
+                                  Advanced
+                                </SelectItem>
+                                <SelectItem value="expert">Expert</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="sportSpecific" className="text-sm">
+                              Sport-Specific Skills
+                            </Label>
+                            <Input
+                              id="sportSpecific"
+                              name="sportSpecific"
+                              type="text"
+                              placeholder="e.g., Tennis, Martial Arts, Dance"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="reactionTime" className="text-sm">
+                              Reaction Time
+                            </Label>
+                            <Select name="reactionTime" defaultValue="average">
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select level" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="slow">Slow</SelectItem>
+                                <SelectItem value="average">Average</SelectItem>
+                                <SelectItem value="fast">Fast</SelectItem>
+                                <SelectItem value="veryfast">
+                                  Very Fast
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="balanceLevel" className="text-sm">
+                              Balance Level
+                            </Label>
+                            <Select name="balanceLevel" defaultValue="medium">
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select level" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="poor">Poor</SelectItem>
+                                <SelectItem value="medium">Medium</SelectItem>
+                                <SelectItem value="good">Good</SelectItem>
+                                <SelectItem value="excellent">
+                                  Excellent
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                       </div>
 
@@ -441,7 +668,7 @@ export default function Onboarding() {
                       </div>
 
                       <div className="space-y-4">
-                        <Label>Stress Level</Label>
+                        <Label>Stress & Recovery</Label>
                         <div className="space-y-2">
                           <Label
                             htmlFor="stressLevel"
@@ -462,6 +689,144 @@ export default function Onboarding() {
                             <span>Medium</span>
                             <span>High</span>
                           </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="adaptabilityToChange"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Adaptability to New Training Stimuli
+                          </Label>
+                          <Slider
+                            id="adaptabilityToChange"
+                            name="adaptabilityToChange"
+                            defaultValue={[50]}
+                            max={100}
+                            step={10}
+                            className="py-4"
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Slow</span>
+                            <span>Average</span>
+                            <span>Fast</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="recoveryAbility" className="text-sm">
+                            Recovery Ability
+                          </Label>
+                          <Select name="recoveryAbility" defaultValue="average">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select recovery ability" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="poor">
+                                Poor - Need extra rest days
+                              </SelectItem>
+                              <SelectItem value="average">
+                                Average - Standard recovery time
+                              </SelectItem>
+                              <SelectItem value="good">
+                                Good - Faster than average
+                              </SelectItem>
+                              <SelectItem value="excellent">
+                                Excellent - Very quick recovery
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Consistency & Progress Tracking</Label>
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="trainingConsistency"
+                            className="text-sm"
+                          >
+                            Training Consistency
+                          </Label>
+                          <Select
+                            name="trainingConsistency"
+                            defaultValue="moderate"
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select consistency level" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="verylow">
+                                Very Low - Often miss workouts
+                              </SelectItem>
+                              <SelectItem value="low">
+                                Low - Frequently inconsistent
+                              </SelectItem>
+                              <SelectItem value="moderate">
+                                Moderate - Sometimes miss workouts
+                              </SelectItem>
+                              <SelectItem value="high">
+                                High - Rarely miss workouts
+                              </SelectItem>
+                              <SelectItem value="veryhigh">
+                                Very High - Never miss workouts
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="progressRate" className="text-sm">
+                            Rate of Progress (last 3 months)
+                          </Label>
+                          <Select name="progressRate" defaultValue="steady">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select progress rate" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">
+                                None - No visible progress
+                              </SelectItem>
+                              <SelectItem value="slow">
+                                Slow - Minimal progress
+                              </SelectItem>
+                              <SelectItem value="steady">
+                                Steady - Consistent progress
+                              </SelectItem>
+                              <SelectItem value="fast">
+                                Fast - Significant progress
+                              </SelectItem>
+                              <SelectItem value="veryfast">
+                                Very Fast - Exceptional progress
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="trackingMethod" className="text-sm">
+                            How do you track your progress?
+                          </Label>
+                          <Select name="trackingMethod" defaultValue="mental">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select tracking method" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">
+                                Don't track progress
+                              </SelectItem>
+                              <SelectItem value="mental">
+                                Mental notes only
+                              </SelectItem>
+                              <SelectItem value="journal">
+                                Written journal/log
+                              </SelectItem>
+                              <SelectItem value="app">Fitness app</SelectItem>
+                              <SelectItem value="coach">
+                                Coach/trainer feedback
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
 
