@@ -35,7 +35,15 @@ import {
   Heart,
   Plus,
   GitBranch,
+  Apple,
+  Utensils,
+  Droplet,
+  Flame,
 } from "lucide-react";
+import { AddFamilyMemberDialog } from "@/components/genealogy/add-family-member-dialog";
+import { FamilyTreeExtended } from "@/components/genealogy/family-tree-extended";
+import { MetabolicHealthCard } from "@/components/nutrition/metabolic-health-card";
+import { NutritionProfileCard } from "@/components/nutrition/nutrition-profile-card";
 import { OnboardingProgress } from "@/components/onboarding/onboarding-progress";
 import { useState } from "react";
 import {
@@ -49,8 +57,39 @@ import {
 export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(0);
   const [familyMembers, setFamilyMembers] = useState([
-    { id: 1, name: "You", relation: "self", age: 30, healthConditions: [] },
+    {
+      id: "user-self",
+      name: "You",
+      relation: "self",
+      generation: 0,
+      age: 30,
+      healthConditions: [],
+    },
   ]);
+
+  // Metabolic health state
+  const [metabolicHealth, setMetabolicHealth] = useState({
+    basalMetabolism: 1800,
+    hydrationLevel: 70,
+    insulinSensitivity: 65,
+    ironLevels: 80,
+    chronicInflammation: 25,
+    metabolicAge: 30,
+  });
+
+  // Nutrition profile state
+  const [nutritionProfile, setNutritionProfile] = useState({
+    dietType: "Mixed",
+    mealFrequency: 3,
+    proteinIntake: 1.6,
+    carbIntake: 45,
+    fatIntake: 30,
+    fiberIntake: 25,
+    waterIntake: 2.5,
+    supplementsUsed: [],
+    foodSensitivities: [],
+    nutritionalGoals: [],
+  });
 
   const addFamilyMember = (member) => {
     setFamilyMembers([
@@ -78,7 +117,7 @@ export default function Onboarding() {
               </p>
             </div>
 
-            <OnboardingProgress currentStep={currentStep} totalSteps={5} />
+            <OnboardingProgress currentStep={currentStep} totalSteps={7} />
 
             <Tabs
               defaultValue="personal"
@@ -88,13 +127,15 @@ export default function Onboarding() {
                   personal: 0,
                   physical: 1,
                   health: 2,
-                  family: 3,
-                  genealogy: 4,
+                  metabolic: 3,
+                  nutrition: 4,
+                  family: 5,
+                  genealogy: 6,
                 };
                 setCurrentStep(stepMap[value] || 0);
               }}
             >
-              <TabsList className="grid grid-cols-5 w-full mb-8">
+              <TabsList className="grid grid-cols-7 w-full mb-8">
                 <TabsTrigger
                   value="personal"
                   className="flex items-center gap-2"
@@ -112,6 +153,20 @@ export default function Onboarding() {
                 <TabsTrigger value="health" className="flex items-center gap-2">
                   <Heart size={16} />
                   <span>Health</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="metabolic"
+                  className="flex items-center gap-2"
+                >
+                  <Flame size={16} />
+                  <span>Metabolic</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="nutrition"
+                  className="flex items-center gap-2"
+                >
+                  <Utensils size={16} />
+                  <span>Nutrition</span>
                 </TabsTrigger>
                 <TabsTrigger value="family" className="flex items-center gap-2">
                   <Users size={16} />
@@ -205,6 +260,47 @@ export default function Onboarding() {
                               <SelectItem value="unknown">Unknown</SelectItem>
                             </SelectContent>
                           </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="ethnicity">Ethnicity</Label>
+                          <Select name="ethnicity" defaultValue="">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select ethnicity" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Basque">Basque</SelectItem>
+                              <SelectItem value="Catalan">Catalan</SelectItem>
+                              <SelectItem value="Galician">Galician</SelectItem>
+                              <SelectItem value="Andalusian">
+                                Andalusian
+                              </SelectItem>
+                              <SelectItem value="Northern European">
+                                Northern European
+                              </SelectItem>
+                              <SelectItem value="Mediterranean">
+                                Mediterranean
+                              </SelectItem>
+                              <SelectItem value="Slavic">Slavic</SelectItem>
+                              <SelectItem value="Celtic">Celtic</SelectItem>
+                              <SelectItem value="Germanic">Germanic</SelectItem>
+                              <SelectItem value="Nordic">Nordic</SelectItem>
+                              <SelectItem value="Mixed">Mixed</SelectItem>
+                              <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="countryOfBirth">
+                            Country of Birth
+                          </Label>
+                          <Input
+                            id="countryOfBirth"
+                            name="countryOfBirth"
+                            type="text"
+                            placeholder="Enter country"
+                          />
                         </div>
                       </div>
 
@@ -903,6 +999,694 @@ export default function Onboarding() {
                           className="flex items-center gap-2"
                           onClick={() => {
                             document
+                              .querySelector('[data-value="metabolic"]')
+                              ?.click();
+                          }}
+                        >
+                          <span>Next</span>
+                          <ArrowRight size={16} />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="metabolic" className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Metabolic Health</CardTitle>
+                      <CardDescription>
+                        Information about your metabolic health and function
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-4">
+                        <Label>Basal Metabolism</Label>
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="basalMetabolism"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Estimated Basal Metabolic Rate (kcal/day)
+                          </Label>
+                          <Input
+                            id="basalMetabolism"
+                            name="basalMetabolism"
+                            type="number"
+                            min="800"
+                            max="3000"
+                            defaultValue={metabolicHealth.basalMetabolism}
+                            onChange={(e) =>
+                              setMetabolicHealth({
+                                ...metabolicHealth,
+                                basalMetabolism: parseInt(e.target.value),
+                              })
+                            }
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            This is the amount of energy your body needs at
+                            complete rest
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Hydration Level</Label>
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="hydrationLevel"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Average Hydration Level
+                          </Label>
+                          <Slider
+                            id="hydrationLevel"
+                            name="hydrationLevel"
+                            defaultValue={[metabolicHealth.hydrationLevel]}
+                            max={100}
+                            step={5}
+                            className="py-4"
+                            onValueChange={(value) =>
+                              setMetabolicHealth({
+                                ...metabolicHealth,
+                                hydrationLevel: value[0],
+                              })
+                            }
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Poor</span>
+                            <span>Average</span>
+                            <span>Excellent</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Insulin Sensitivity</Label>
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="insulinSensitivity"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Insulin Response
+                          </Label>
+                          <Slider
+                            id="insulinSensitivity"
+                            name="insulinSensitivity"
+                            defaultValue={[metabolicHealth.insulinSensitivity]}
+                            max={100}
+                            step={5}
+                            className="py-4"
+                            onValueChange={(value) =>
+                              setMetabolicHealth({
+                                ...metabolicHealth,
+                                insulinSensitivity: value[0],
+                              })
+                            }
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Poor</span>
+                            <span>Average</span>
+                            <span>Excellent</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Iron Levels</Label>
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="ironLevels"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Iron Status
+                          </Label>
+                          <Slider
+                            id="ironLevels"
+                            name="ironLevels"
+                            defaultValue={[metabolicHealth.ironLevels]}
+                            max={100}
+                            step={5}
+                            className="py-4"
+                            onValueChange={(value) =>
+                              setMetabolicHealth({
+                                ...metabolicHealth,
+                                ironLevels: value[0],
+                              })
+                            }
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Low</span>
+                            <span>Normal</span>
+                            <span>Optimal</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Chronic Inflammation</Label>
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="chronicInflammation"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Inflammation Level
+                          </Label>
+                          <Slider
+                            id="chronicInflammation"
+                            name="chronicInflammation"
+                            defaultValue={[metabolicHealth.chronicInflammation]}
+                            max={100}
+                            step={5}
+                            className="py-4"
+                            onValueChange={(value) =>
+                              setMetabolicHealth({
+                                ...metabolicHealth,
+                                chronicInflammation: value[0],
+                              })
+                            }
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Low (Good)</span>
+                            <span>Moderate</span>
+                            <span>High (Poor)</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Lower values are better for inflammation
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Metabolic Age</Label>
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="metabolicAge"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Estimated Metabolic Age (years)
+                          </Label>
+                          <Input
+                            id="metabolicAge"
+                            name="metabolicAge"
+                            type="number"
+                            min="15"
+                            max="100"
+                            defaultValue={metabolicHealth.metabolicAge}
+                            onChange={(e) =>
+                              setMetabolicHealth({
+                                ...metabolicHealth,
+                                metabolicAge: parseInt(e.target.value),
+                              })
+                            }
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Your body's biological age based on metabolic
+                            function
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-6">
+                        <MetabolicHealthCard
+                          basalMetabolism={metabolicHealth.basalMetabolism}
+                          hydrationLevel={metabolicHealth.hydrationLevel}
+                          insulinSensitivity={
+                            metabolicHealth.insulinSensitivity
+                          }
+                          ironLevels={metabolicHealth.ironLevels}
+                          chronicInflammation={
+                            metabolicHealth.chronicInflammation
+                          }
+                          metabolicAge={metabolicHealth.metabolicAge}
+                        />
+                      </div>
+
+                      <input
+                        type="hidden"
+                        name="metabolicHealth"
+                        value={JSON.stringify(metabolicHealth)}
+                      />
+
+                      <div className="flex justify-between">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="flex items-center gap-2"
+                          onClick={() => {
+                            document
+                              .querySelector('[data-value="health"]')
+                              ?.click();
+                          }}
+                        >
+                          <ArrowRight size={16} className="rotate-180" />
+                          <span>Previous</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          className="flex items-center gap-2"
+                          onClick={() => {
+                            document
+                              .querySelector('[data-value="nutrition"]')
+                              ?.click();
+                          }}
+                        >
+                          <span>Next</span>
+                          <ArrowRight size={16} />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="nutrition" className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Nutrition Profile</CardTitle>
+                      <CardDescription>
+                        Information about your dietary patterns and nutritional
+                        intake
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="space-y-4">
+                        <Label>Diet Type</Label>
+                        <div className="space-y-2">
+                          <Select
+                            name="dietType"
+                            defaultValue={nutritionProfile.dietType}
+                            onValueChange={(value) =>
+                              setNutritionProfile({
+                                ...nutritionProfile,
+                                dietType: value,
+                              })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select diet type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Mixed">
+                                Mixed / Omnivore
+                              </SelectItem>
+                              <SelectItem value="Vegetarian">
+                                Vegetarian
+                              </SelectItem>
+                              <SelectItem value="Vegan">Vegan</SelectItem>
+                              <SelectItem value="Pescatarian">
+                                Pescatarian
+                              </SelectItem>
+                              <SelectItem value="Keto">Ketogenic</SelectItem>
+                              <SelectItem value="Paleo">Paleo</SelectItem>
+                              <SelectItem value="Mediterranean">
+                                Mediterranean
+                              </SelectItem>
+                              <SelectItem value="Low-Carb">Low Carb</SelectItem>
+                              <SelectItem value="High-Protein">
+                                High Protein
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Meal Frequency</Label>
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="mealFrequency"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Meals per day (including snacks)
+                          </Label>
+                          <Slider
+                            id="mealFrequency"
+                            name="mealFrequency"
+                            defaultValue={[nutritionProfile.mealFrequency]}
+                            min={1}
+                            max={8}
+                            step={1}
+                            className="py-4"
+                            onValueChange={(value) =>
+                              setNutritionProfile({
+                                ...nutritionProfile,
+                                mealFrequency: value[0],
+                              })
+                            }
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>1</span>
+                            <span>2</span>
+                            <span>3</span>
+                            <span>4</span>
+                            <span>5</span>
+                            <span>6</span>
+                            <span>7</span>
+                            <span>8+</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Macronutrient Distribution</Label>
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="proteinIntake"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Protein Intake (g/kg of bodyweight)
+                          </Label>
+                          <Slider
+                            id="proteinIntake"
+                            name="proteinIntake"
+                            defaultValue={[nutritionProfile.proteinIntake * 10]}
+                            min={5}
+                            max={30}
+                            step={1}
+                            className="py-4"
+                            onValueChange={(value) =>
+                              setNutritionProfile({
+                                ...nutritionProfile,
+                                proteinIntake: value[0] / 10,
+                              })
+                            }
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>0.5</span>
+                            <span>1.0</span>
+                            <span>1.5</span>
+                            <span>2.0</span>
+                            <span>2.5</span>
+                            <span>3.0</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Current: {nutritionProfile.proteinIntake} g/kg
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="carbIntake"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Carbohydrate Intake (% of total calories)
+                          </Label>
+                          <Slider
+                            id="carbIntake"
+                            name="carbIntake"
+                            defaultValue={[nutritionProfile.carbIntake]}
+                            min={5}
+                            max={75}
+                            step={5}
+                            className="py-4"
+                            onValueChange={(value) =>
+                              setNutritionProfile({
+                                ...nutritionProfile,
+                                carbIntake: value[0],
+                              })
+                            }
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>5%</span>
+                            <span>25%</span>
+                            <span>50%</span>
+                            <span>75%</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="fatIntake"
+                            className="text-sm text-muted-foreground"
+                          >
+                            Fat Intake (% of total calories)
+                          </Label>
+                          <Slider
+                            id="fatIntake"
+                            name="fatIntake"
+                            defaultValue={[nutritionProfile.fatIntake]}
+                            min={10}
+                            max={70}
+                            step={5}
+                            className="py-4"
+                            onValueChange={(value) =>
+                              setNutritionProfile({
+                                ...nutritionProfile,
+                                fatIntake: value[0],
+                              })
+                            }
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>10%</span>
+                            <span>30%</span>
+                            <span>50%</span>
+                            <span>70%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="fiberIntake" className="text-sm">
+                            Fiber Intake (g/day)
+                          </Label>
+                          <Input
+                            id="fiberIntake"
+                            name="fiberIntake"
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={nutritionProfile.fiberIntake}
+                            onChange={(e) =>
+                              setNutritionProfile({
+                                ...nutritionProfile,
+                                fiberIntake: Number(e.target.value),
+                              })
+                            }
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="waterIntake" className="text-sm">
+                            Water Intake (liters/day)
+                          </Label>
+                          <Input
+                            id="waterIntake"
+                            name="waterIntake"
+                            type="number"
+                            min="0"
+                            max="10"
+                            step="0.1"
+                            value={nutritionProfile.waterIntake}
+                            onChange={(e) =>
+                              setNutritionProfile({
+                                ...nutritionProfile,
+                                waterIntake: Number(e.target.value),
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Supplements Used</Label>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                          {[
+                            { id: "protein", label: "Protein Powder" },
+                            { id: "creatine", label: "Creatine" },
+                            { id: "bcaa", label: "BCAAs" },
+                            { id: "preworkout", label: "Pre-Workout" },
+                            { id: "vitamins", label: "Multivitamin" },
+                            { id: "omega3", label: "Omega-3" },
+                            { id: "vitaminD", label: "Vitamin D" },
+                            { id: "magnesium", label: "Magnesium" },
+                            { id: "zinc", label: "Zinc" },
+                          ].map((supplement) => (
+                            <div
+                              key={supplement.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`supplement-${supplement.id}`}
+                                checked={nutritionProfile.supplementsUsed.includes(
+                                  supplement.id,
+                                )}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setNutritionProfile({
+                                      ...nutritionProfile,
+                                      supplementsUsed: [
+                                        ...nutritionProfile.supplementsUsed,
+                                        supplement.id,
+                                      ],
+                                    });
+                                  } else {
+                                    setNutritionProfile({
+                                      ...nutritionProfile,
+                                      supplementsUsed:
+                                        nutritionProfile.supplementsUsed.filter(
+                                          (id) => id !== supplement.id,
+                                        ),
+                                    });
+                                  }
+                                }}
+                              />
+                              <Label htmlFor={`supplement-${supplement.id}`}>
+                                {supplement.label}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Food Sensitivities</Label>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                          {[
+                            { id: "gluten", label: "Gluten" },
+                            { id: "lactose", label: "Lactose" },
+                            { id: "nuts", label: "Nuts" },
+                            { id: "eggs", label: "Eggs" },
+                            { id: "soy", label: "Soy" },
+                            { id: "shellfish", label: "Shellfish" },
+                            { id: "none", label: "None" },
+                          ].map((sensitivity) => (
+                            <div
+                              key={sensitivity.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`sensitivity-${sensitivity.id}`}
+                                checked={nutritionProfile.foodSensitivities.includes(
+                                  sensitivity.id,
+                                )}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    // If "None" is selected, clear other selections
+                                    if (sensitivity.id === "none") {
+                                      setNutritionProfile({
+                                        ...nutritionProfile,
+                                        foodSensitivities: ["none"],
+                                      });
+                                    } else {
+                                      // Remove "none" if it exists and add the new sensitivity
+                                      setNutritionProfile({
+                                        ...nutritionProfile,
+                                        foodSensitivities: [
+                                          ...nutritionProfile.foodSensitivities.filter(
+                                            (id) => id !== "none",
+                                          ),
+                                          sensitivity.id,
+                                        ],
+                                      });
+                                    }
+                                  } else {
+                                    setNutritionProfile({
+                                      ...nutritionProfile,
+                                      foodSensitivities:
+                                        nutritionProfile.foodSensitivities.filter(
+                                          (id) => id !== sensitivity.id,
+                                        ),
+                                    });
+                                  }
+                                }}
+                              />
+                              <Label htmlFor={`sensitivity-${sensitivity.id}`}>
+                                {sensitivity.label}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <Label>Nutritional Goals</Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {[
+                            { id: "weightLoss", label: "Weight Loss" },
+                            { id: "muscleGain", label: "Muscle Gain" },
+                            { id: "maintenance", label: "Maintenance" },
+                            { id: "performance", label: "Performance" },
+                            { id: "health", label: "General Health" },
+                            { id: "energy", label: "Energy Levels" },
+                          ].map((goal) => (
+                            <div
+                              key={goal.id}
+                              className="flex items-center space-x-2"
+                            >
+                              <Checkbox
+                                id={`goal-${goal.id}`}
+                                checked={nutritionProfile.nutritionalGoals.includes(
+                                  goal.id,
+                                )}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setNutritionProfile({
+                                      ...nutritionProfile,
+                                      nutritionalGoals: [
+                                        ...nutritionProfile.nutritionalGoals,
+                                        goal.id,
+                                      ],
+                                    });
+                                  } else {
+                                    setNutritionProfile({
+                                      ...nutritionProfile,
+                                      nutritionalGoals:
+                                        nutritionProfile.nutritionalGoals.filter(
+                                          (id) => id !== goal.id,
+                                        ),
+                                    });
+                                  }
+                                }}
+                              />
+                              <Label htmlFor={`goal-${goal.id}`}>
+                                {goal.label}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mt-6">
+                        <NutritionProfileCard
+                          dietType={nutritionProfile.dietType}
+                          mealFrequency={nutritionProfile.mealFrequency}
+                          proteinIntake={nutritionProfile.proteinIntake}
+                          carbIntake={nutritionProfile.carbIntake}
+                          fatIntake={nutritionProfile.fatIntake}
+                          fiberIntake={nutritionProfile.fiberIntake}
+                          waterIntake={nutritionProfile.waterIntake}
+                          supplementsUsed={nutritionProfile.supplementsUsed}
+                          foodSensitivities={nutritionProfile.foodSensitivities}
+                          nutritionalGoals={nutritionProfile.nutritionalGoals}
+                        />
+                      </div>
+
+                      <input
+                        type="hidden"
+                        name="nutritionProfile"
+                        value={JSON.stringify(nutritionProfile)}
+                      />
+
+                      <div className="flex justify-between">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="flex items-center gap-2"
+                          onClick={() => {
+                            document
+                              .querySelector('[data-value="metabolic"]')
+                              ?.click();
+                          }}
+                        >
+                          <ArrowRight size={16} className="rotate-180" />
+                          <span>Previous</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          className="flex items-center gap-2"
+                          onClick={() => {
+                            document
                               .querySelector('[data-value="family"]')
                               ?.click();
                           }}
@@ -1089,7 +1873,7 @@ export default function Onboarding() {
                           className="flex items-center gap-2"
                           onClick={() => {
                             document
-                              .querySelector('[data-value="health"]')
+                              .querySelector('[data-value="nutrition"]')
                               ?.click();
                           }}
                         >
@@ -1127,162 +1911,124 @@ export default function Onboarding() {
                         <h3 className="text-lg font-medium">
                           Your Family Members
                         </h3>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              size="sm"
-                              className="flex items-center gap-2"
-                            >
-                              <Plus size={16} />
-                              <span>Add Family Member</span>
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Add Family Member</DialogTitle>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                              <div className="space-y-2">
-                                <Label htmlFor="memberName">Name</Label>
-                                <Input
-                                  id="memberName"
-                                  placeholder="Enter name"
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="relation">Relation</Label>
-                                <Select defaultValue="">
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select relation" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="father">
-                                      Father
-                                    </SelectItem>
-                                    <SelectItem value="mother">
-                                      Mother
-                                    </SelectItem>
-                                    <SelectItem value="brother">
-                                      Brother
-                                    </SelectItem>
-                                    <SelectItem value="sister">
-                                      Sister
-                                    </SelectItem>
-                                    <SelectItem value="grandfather">
-                                      Grandfather
-                                    </SelectItem>
-                                    <SelectItem value="grandmother">
-                                      Grandmother
-                                    </SelectItem>
-                                    <SelectItem value="other">Other</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="memberAge">Age</Label>
-                                <Input
-                                  id="memberAge"
-                                  type="number"
-                                  min="1"
-                                  max="120"
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label>Health Conditions</Label>
-                                <div className="grid grid-cols-2 gap-2">
-                                  <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id="memberHypertension"
-                                      value="hypertension"
-                                    />
-                                    <Label htmlFor="memberHypertension">
-                                      Hypertension
-                                    </Label>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id="memberDiabetes"
-                                      value="diabetes"
-                                    />
-                                    <Label htmlFor="memberDiabetes">
-                                      Diabetes
-                                    </Label>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id="memberHeartDisease"
-                                      value="heartDisease"
-                                    />
-                                    <Label htmlFor="memberHeartDisease">
-                                      Heart Disease
-                                    </Label>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id="memberCancer"
-                                      value="cancer"
-                                    />
-                                    <Label htmlFor="memberCancer">Cancer</Label>
+                        <AddFamilyMemberDialog
+                          existingMembers={familyMembers}
+                          onAddMember={(newMember) => {
+                            setFamilyMembers([
+                              ...familyMembers,
+                              {
+                                id: newMember.id,
+                                name: newMember.name,
+                                relation: newMember.relationship,
+                                age: newMember.birthYear
+                                  ? new Date().getFullYear() -
+                                    newMember.birthYear
+                                  : 0,
+                                healthConditions:
+                                  newMember.medicalHistory || [],
+                                // Additional properties
+                                side: newMember.side,
+                                generation: newMember.generation,
+                                origin: newMember.origin,
+                                ethnicity: newMember.ethnicity,
+                                eyeColor: newMember.eyeColor,
+                                hairColor: newMember.hairColor,
+                                height: newMember.height,
+                                weight: newMember.weight,
+                                build: newMember.build,
+                                athleticHistory: newMember.athleticHistory,
+                                countryOfBirth: newMember.countryOfBirth,
+                                description: newMember.description,
+                              },
+                            ]);
+                          }}
+                        />
+                      </div>
+
+                      {familyMembers.length > 0 ? (
+                        <div className="space-y-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {familyMembers.map((member) => (
+                              <div
+                                key={member.id}
+                                className="border rounded-lg p-4 bg-card"
+                              >
+                                <div className="flex justify-between items-center mb-2">
+                                  <h4 className="font-medium">{member.name}</h4>
+                                  <div>
+                                    <span className="text-sm text-muted-foreground capitalize">
+                                      {member.relation}
+                                    </span>
+                                    {member.side && (
+                                      <span className="text-xs text-muted-foreground ml-1">
+                                        ({member.side})
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
+                                <div className="text-sm space-y-1">
+                                  <p>Age: {member.age}</p>
+                                  {member.origin && (
+                                    <p>Origin: {member.origin}</p>
+                                  )}
+                                  {member.height && (
+                                    <p>Height: {member.height}</p>
+                                  )}
+                                  {member.hairColor && (
+                                    <p>Hair: {member.hairColor}</p>
+                                  )}
+                                  {member.eyeColor && (
+                                    <p>Eyes: {member.eyeColor}</p>
+                                  )}
+                                  <p className="mt-1">
+                                    Health Conditions:{" "}
+                                    {member.healthConditions.length > 0 &&
+                                    member.healthConditions[0] !== "none"
+                                      ? member.healthConditions.join(", ")
+                                      : "None"}
+                                  </p>
+                                </div>
                               </div>
-                            </div>
-                            <div className="flex justify-end">
-                              <Button
-                                type="button"
-                                onClick={() => {
-                                  // In a real implementation, we would collect the form data
-                                  // and call addFamilyMember with the collected data
-                                  addFamilyMember({
-                                    name: "New Member",
-                                    relation: "other",
-                                    age: 50,
-                                    healthConditions: [],
-                                  });
-                                }}
-                              >
-                                Add Member
-                              </Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {familyMembers.map((member) => (
-                          <div
-                            key={member.id}
-                            className="border rounded-lg p-4 bg-card"
-                          >
-                            <div className="flex justify-between items-center mb-2">
-                              <h4 className="font-medium">{member.name}</h4>
-                              <span className="text-sm text-muted-foreground capitalize">
-                                {member.relation}
-                              </span>
-                            </div>
-                            <div className="text-sm">
-                              <p>Age: {member.age}</p>
-                              <p className="mt-1">
-                                Health Conditions:{" "}
-                                {member.healthConditions.length > 0
-                                  ? member.healthConditions.join(", ")
-                                  : "None"}
-                              </p>
-                            </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
 
-                      <div className="mt-8 p-4 border border-dashed rounded-lg bg-muted/50 flex flex-col items-center justify-center">
-                        <GitBranch
-                          size={48}
-                          className="text-muted-foreground mb-2"
-                        />
-                        <p className="text-center text-muted-foreground">
-                          Your family tree visualization will appear here as you
-                          add more family members
-                        </p>
-                      </div>
+                          <div className="border rounded-lg p-4">
+                            <h4 className="font-medium mb-4">
+                              Family Tree Visualization
+                            </h4>
+                            <FamilyTreeExtended
+                              members={familyMembers.map((m) => ({
+                                id: m.id,
+                                name: m.name,
+                                relationship: m.relation,
+                                generation: m.generation || 0,
+                                side: m.side as "paternal" | "maternal",
+                                parentId: m.parentId,
+                                origin: m.origin,
+                                ethnicity: m.ethnicity,
+                                somatotype: m.build,
+                                eyeColor: m.eyeColor,
+                                hairColor: m.hairColor,
+                                height: m.height,
+                                build: m.build,
+                                athleticHistory: m.athleticHistory,
+                                medicalHistory: m.healthConditions,
+                              }))}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-8 p-4 border border-dashed rounded-lg bg-muted/50 flex flex-col items-center justify-center">
+                          <GitBranch
+                            size={48}
+                            className="text-muted-foreground mb-2"
+                          />
+                          <p className="text-center text-muted-foreground">
+                            Your family tree visualization will appear here as
+                            you add more family members
+                          </p>
+                        </div>
+                      )}
 
                       <input
                         type="hidden"

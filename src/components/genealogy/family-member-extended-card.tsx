@@ -7,10 +7,11 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { EditFamilyMemberDialog } from "./edit-family-member-dialog";
+import { DeleteFamilyMemberDialog } from "./delete-family-member-dialog";
 
 interface FamilyMemberExtendedCardProps {
+  id?: string;
   name: string;
   relationship: string;
   generation?: number;
@@ -27,10 +28,12 @@ interface FamilyMemberExtendedCardProps {
   medicalHistory?: string[];
   onEdit?: () => void;
   onDelete?: () => void;
+  onSuccess?: () => void;
   className?: string;
 }
 
 export function FamilyMemberExtendedCard({
+  id,
   name,
   relationship,
   generation,
@@ -47,8 +50,27 @@ export function FamilyMemberExtendedCard({
   medicalHistory = [],
   onEdit,
   onDelete,
+  onSuccess,
   className = "",
 }: FamilyMemberExtendedCardProps) {
+  const member = {
+    id,
+    name,
+    relationship,
+    generation,
+    side,
+    origin,
+    ethnicity,
+    somatotype,
+    eyeColor,
+    hairColor,
+    height,
+    build,
+    athleticHistory,
+    geneticTraits,
+    medicalHistory,
+  };
+
   return (
     <Card className={className}>
       <CardHeader className="pb-2">
@@ -126,7 +148,7 @@ export function FamilyMemberExtendedCard({
           )}
 
           {/* Medical history */}
-          {medicalHistory.length > 0 && (
+          {medicalHistory.length > 0 && medicalHistory[0] !== "" && (
             <div>
               <h4 className="text-sm font-medium mb-1">Medical History</h4>
               <div className="flex flex-wrap gap-1">
@@ -147,28 +169,17 @@ export function FamilyMemberExtendedCard({
           </div>
         </div>
       </CardContent>
-      {(onEdit || onDelete) && (
+      {id && (
         <CardFooter className="flex justify-end gap-2 pt-2">
-          {onEdit && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onEdit}
-              className="h-8 px-2"
-            >
-              <Edit size={14} className="mr-1" /> Edit
-            </Button>
-          )}
-          {onDelete && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onDelete}
-              className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-            >
-              <Trash2 size={14} className="mr-1" /> Delete
-            </Button>
-          )}
+          <EditFamilyMemberDialog
+            member={member}
+            onSuccess={onSuccess || onEdit}
+          />
+          <DeleteFamilyMemberDialog
+            memberId={id}
+            memberName={name}
+            onSuccess={onSuccess || onDelete}
+          />
         </CardFooter>
       )}
     </Card>

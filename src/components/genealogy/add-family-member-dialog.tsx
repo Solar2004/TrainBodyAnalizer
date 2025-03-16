@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -21,21 +21,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientSideClient } from "../../../supabase/client-side";
 import { PlusCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface AddFamilyMemberDialogProps {
   onSuccess?: () => void;
   trigger?: React.ReactNode;
+  existingMembers?: any[];
+  onAddMember?: (member: any) => void;
+  memberToEdit?: any;
+  isEditing?: boolean;
 }
 
 export function AddFamilyMemberDialog({
   onSuccess,
   trigger,
+  existingMembers = [],
+  onAddMember,
+  memberToEdit,
+  isEditing = false,
 }: AddFamilyMemberDialogProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
+    id: "",
     name: "",
     relationship: "",
     generation: 1,
@@ -48,10 +60,35 @@ export function AddFamilyMemberDialog({
     height: "",
     build: "",
     athleticHistory: "",
+    medicalHistory: [] as string[],
   });
 
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClientSideClient();
+
+  // If editing, populate form with existing data
+  useEffect(() => {
+    if (memberToEdit && isEditing) {
+      setFormData({
+        id: memberToEdit.id || "",
+        name: memberToEdit.name || "",
+        relationship: memberToEdit.relationship || "",
+        generation: memberToEdit.generation || 1,
+        side: memberToEdit.side || "",
+        origin: memberToEdit.origin || "",
+        ethnicity: memberToEdit.ethnicity || "",
+        somatotype: memberToEdit.somatotype || "",
+        eyeColor: memberToEdit.eyeColor || memberToEdit.eye_color || "",
+        hairColor: memberToEdit.hairColor || memberToEdit.hair_color || "",
+        height: memberToEdit.height || "",
+        build: memberToEdit.build || "",
+        athleticHistory:
+          memberToEdit.athleticHistory || memberToEdit.athletic_history || "",
+        medicalHistory:
+          memberToEdit.medicalHistory || memberToEdit.medical_history || [],
+      });
+    }
+  }, [memberToEdit, isEditing]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -65,6 +102,7 @@ export function AddFamilyMemberDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
     try {
       // Get current user
@@ -86,8 +124,7 @@ export function AddFamilyMemberDialog({
         generation = 3;
       }
 
-      // Insert family member
-      const { error } = await supabase.from("family_members").insert({
+      const memberData = {
         user_id: user.id,
         name: formData.name,
         relationship: formData.relationship,
@@ -102,17 +139,55 @@ export function AddFamilyMemberDialog({
         build: formData.build || null,
         athletic_history: formData.athleticHistory || null,
         genetic_traits: JSON.stringify([]),
-        medical_history: JSON.stringify([]),
-      });
+        medical_history: JSON.stringify(formData.medicalHistory || []),
+      };
 
-      if (error) throw error;
+      // We'll try to insert directly without checking for table existence first
+      // If there's an error, we'll handle it in the catch block
+
+      let result;
+      if (isEditing && formData.id) {
+        // Update existing family member
+        result = await supabase
+          .from("family_members")
+          .update(memberData)
+          .eq("id", formData.id);
+      } else {
+        // Insert new family member
+        result = await supabase.from("family_members").insert(memberData);
+      }
+
+      if (result.error) throw result.error;
+
+      // For local state management (like in onboarding)
+      if (onAddMember) {
+        onAddMember({
+          id: formData.id || Date.now().toString(),
+          name: formData.name,
+          relationship: formData.relationship,
+          generation: generation,
+          side: formData.side,
+          origin: formData.origin,
+          ethnicity: formData.ethnicity,
+          somatotype: formData.somatotype,
+          eyeColor: formData.eyeColor,
+          hairColor: formData.hairColor,
+          height: formData.height,
+          build: formData.build,
+          athleticHistory: formData.athleticHistory,
+          medicalHistory: formData.medicalHistory,
+        });
+      }
 
       // Close dialog and refresh
       setOpen(false);
       if (onSuccess) onSuccess();
       router.refresh();
-    } catch (error) {
-      console.error("Error adding family member:", error);
+    } catch (error: any) {
+      console.error("Error adding/updating family member:", error);
+      setError(
+        error.message || "Failed to save family member. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -124,18 +199,33 @@ export function AddFamilyMemberDialog({
         {trigger || (
           <Button className="flex items-center gap-2">
             <PlusCircle size={16} />
-            <span>Add Family Member</span>
+            <span>
+              {isEditing ? "Edit Family Member" : "Add Family Member"}
+            </span>
           </Button>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Add Family Member</DialogTitle>
+            <DialogTitle>
+              {isEditing ? "Edit Family Member" : "Add Family Member"}
+            </DialogTitle>
             <DialogDescription>
-              Add a new family member to your genealogy tree.
+              {isEditing
+                ? "Update information for this family member."
+                : "Add a new family member to your genealogy tree."}
             </DialogDescription>
           </DialogHeader>
+
+          {error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -314,7 +404,7 @@ export function AddFamilyMemberDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Saving..." : "Add Member"}
+              {isLoading ? "Saving..." : isEditing ? "Update" : "Add Member"}
             </Button>
           </DialogFooter>
         </form>

@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ArrowLeft, ArrowRight, Info } from "lucide-react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientSideClient } from "../../../supabase/client-side";
 
 interface Metrics {
   volume: number;
@@ -33,7 +33,7 @@ export default function MetricsOnboarding() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClientSideClient();
 
   useEffect(() => {
     const fetchMetrics = async () => {

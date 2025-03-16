@@ -21,7 +21,7 @@ import {
   Users,
   Dna,
 } from "lucide-react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientSideClient } from "../../../supabase/client-side";
 
 interface UserProfile {
   age: number;
@@ -70,7 +70,7 @@ export default function OnboardingSummary() {
   const [familyCount, setFamilyCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClientSideClient();
 
   useEffect(() => {
     const fetchData = async () => {

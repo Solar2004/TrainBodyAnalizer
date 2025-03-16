@@ -8,7 +8,7 @@ interface OnboardingProgressProps {
 
 export function OnboardingProgress({
   currentStep,
-  totalSteps,
+  totalSteps = 7,
 }: OnboardingProgressProps) {
   return (
     <div className="flex items-center justify-center space-x-2 mb-8">

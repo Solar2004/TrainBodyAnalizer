@@ -55,14 +55,14 @@ Tipos: ✅ Implementados (ectomorfo, mesomorfo, endomorfo)
 Evaluación: ✅ Implementado (formulario de onboarding)
 Impacto: ✅ Implementado (afecta cálculos de fuerza y resistencia)
 Salud Metabólica y Nutrición
-Metabolismo basal: ❌ No implementado
-Hidratación: ❌ No implementado
-Sensibilidad insulínica: ❌ No implementado
-Niveles de hierro: ❌ No implementado
-Inflamación crónica: ❌ No implementado
+Metabolismo basal: ✅ Implementado
+Hidratación: ✅ Implementado
+Sensibilidad insulínica: ✅ Implementado
+Niveles de hierro: ✅ Implementado
+Inflamación crónica: ✅ Implementado
 Neurofisiológicos y Cognitivos
-Tiempo de reacción: ❌ No implementado
-Resistencia al estrés: ✅ Parcialmente implementado (nivel de estrés)
+Tiempo de reacción: ✅ Implementado
+Resistencia al estrés: ✅ Implementado (nivel de estrés)
 Calidad del sueño: ✅ Implementado
 Coordinación ojo-mano: ❌ No implementado
 Biomecánica y Movimiento
@@ -83,10 +83,12 @@ Hábitos digitales: ❌ No implementado
 Análisis Genealógico y Herencia
 Árbol genealógico: ✅ Implementado
 Origen geográfico: ✅ Implementado
-Características físicas heredadas: ✅ Parcialmente implementado
-Biotipos familiares: ✅ Parcialmente implementado
+Características físicas heredadas: ✅ Implementado
+Biotipos familiares: ✅ Implementado
 Longevidad y salud: ✅ Implementado
 Rendimiento atlético familiar: ✅ Implementado
+Edición de miembros familiares: ✅ Implementado
+Eliminación de miembros familiares: ✅ Implementado
 Datos Bioquímicos
 Testosterona: ✅ Implementado en tipos, ❌ no en UI
 Cortisol: ❌ No implementado
@@ -107,18 +109,18 @@ Inserciones musculares: ❌ No implementado
 Postura: ❌ No implementado
 Rango de movimiento: ❌ No implementado
 Datos Nutricionales
-Ingesta calórica: ❌ No implementado
-Distribución de macronutrientes: ❌ No implementado
-Timing nutricional: ❌ No implementado
+Ingesta calórica: ✅ Implementado
+Distribución de macronutrientes: ✅ Implementado
+Timing nutricional: ✅ Implementado
 Alimentos habituales: ❌ No implementado
-Suplementación: ❌ No implementado
-Hidratación: ❌ No implementado
-Intolerancias/alergias: ❌ No implementado
+Suplementación: ✅ Implementado
+Hidratación: ✅ Implementado
+Intolerancias/alergias: ✅ Implementado
 Indicadores de Densidad Ósea
-Actividad física: ✅ Parcialmente implementado
+Actividad física: ✅ Implementado
 Historial de fracturas: ❌ No implementado
-Dieta: ❌ No implementado
-Factores de riesgo: ✅ Parcialmente implementado (edad, sexo)
+Dieta: ✅ Implementado
+Factores de riesgo: ✅ Implementado (edad, sexo)
 
 ## Métricas y Parámetros
 
@@ -129,11 +131,11 @@ Los 9 parámetros principales están implementados con cálculos mejorados y fue
 - **Potencial**: ✅ Cálculos basados en genética y factores familiares
 - **Resistencia**: ✅ Cálculos refinados con datos de frecuencia cardíaca y distancia
 - **Fuerza**: ✅ Integración de datos de pruebas de fuerza específicas (bench press, squat, deadlift, pull-ups)
-- **Adaptabilidad**: ✅ Algoritmos que analizan la velocidad de adaptación a entrenamientos
-- **Progreso**: ✅ Análisis basado en tasa de progreso reportada y métodos de seguimiento
-- **Coordinación**: ✅ Pruebas específicas de coordinación y equilibrio
-- **Agilidad**: ✅ Métricas de tiempo de reacción y deportes específicos
-- **Consistencia**: ✅ Análisis de consistencia autoreportada y métodos de seguimiento
+- **Adaptabilidad**: ✅ Algoritmos que analizan la velocidad de adaptación a diferentes estímulos de entrenamiento
+- **Progreso**: ✅ Análisis de tasa de mejora a lo largo del tiempo con seguimiento histórico
+- **Coordinación**: ✅ Evaluación de coordinación motriz y neuromuscular
+- **Agilidad**: ✅ Medición de capacidad de cambio de dirección y posición
+- **Consistencia**: ✅ Análisis de regularidad en el entrenamiento y adherencia
 
 ## Parámetros Adicionales (Implementados)
 
@@ -149,6 +151,9 @@ Estos parámetros están completamente implementados en el backend y se calculan
 - **Eficiencia Metabólica**: ✅ Implementado con factores de edad, composición corporal, intensidad de entrenamiento y calidad del sueño
 - **Riesgo de Lesiones**: ✅ Implementado con evaluación basada en edad, intensidad vs recuperación, condiciones médicas y estrés
 - **Fortaleza Mental**: ✅ Implementado con factores de adaptabilidad, manejo del estrés, consistencia y perseverancia
+- **Análisis Genealógico**: ✅ Implementado con árbol familiar, edición y eliminación de miembros
+- **Perfil Nutricional**: ✅ Implementado con distribución de macronutrientes, hidratación y suplementación
+- **Salud Metabólica**: ✅ Implementado con metabolismo basal, sensibilidad insulínica y niveles de hierro
 
 #### Por Implementar
 - **Testosterona**: Implementar UI y cálculos para integrar niveles hormonales
